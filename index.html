@@ -20,11 +20,11 @@
     <div class="row">
       <div class="col-md-12" >
         <ul data-bind="foreach:markers" class="nav navbar-nav">
-          <li class="list" data-bind="text:title,click:$parent.selectAll"></li>
+          <li class="list" data-bind="text:title,click:$parent.Bounce"></li>
         </ul>
         <form class="navbar-form navbar-left" role="search">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
+            <input type="text" class="form-control" placeholder="Search" data-bind="value:searchtext, valueUpdate: 'afterkeydown', event: {keyup: search}">
           </div>
         </form>
       </div>

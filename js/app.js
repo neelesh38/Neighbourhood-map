@@ -92,6 +92,12 @@ for(var i=0;i<locations.length;i++)
         }
         else {
           marker.rating='';
+        }
+        if(request.hasOwnProperty('likes')!=''){
+          marker.likes=request.likes.summary;
+        }
+        else {
+          marker.likes='';
 
         }
 
@@ -133,7 +139,7 @@ function populateInfoWindow(marker, infowindow) {
         }
       }
 
-this.selectAll=function(marker){
+this.Bounce=function(marker){
   marker.setAnimation(google.maps.Animation.BOUNCE);
   marker.setIcon(highlightedIcon);
   setTimeout(function() {
@@ -143,4 +149,33 @@ this.selectAll=function(marker){
   populateInfoWindow(marker,largeInfowindow);
 };
 
+this.searchtext=ko.observable('');
+this.search=function(){
+  largeInfowindow.close();
+  var text=this.searchtext;
+  if(text.length===0){
+    this.showAll=true;
+  }
+  else {
+    for(var i=0;i<markers.length;i++)
+    {
+      if(markers[i].title.toLowerCase().indexOf(text.toLowerCase())>-1){
+        markers[i].show(true);
+        markers[i].setVisible(true);
+      }
+      else {
+        markers[i].show(false);
+        markers[i].setVisible(false);
+      }
+    }
+  }
+  largeInfowindow.close();
+
+};
+this.showAll=function(marker){
+  for(var i=0;i<markers.length;i++){
+    markers[i].show(marker);
+    marker[i].setVisible(marker);
+  }
+};
 }
