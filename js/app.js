@@ -4,7 +4,6 @@ var locations=[
 			 location:{
 				  lat: 19.8047181,
           lng: 85.8179802,
-          id:'',
         },
         show:true,
         selected:false,
@@ -28,7 +27,7 @@ var locations=[
        },
        show:true,
        selected:false,
-       id:''
+       id:' '
 		  },
 		  {
 			  title: 'Puri Beach',
@@ -39,7 +38,19 @@ var locations=[
         show:true,
         selected:false,
 		    id:'4cfb649ac671721e4959c318'
+		  },
+      {
+			  title: 'Rajarani Temple',
+			  location:{
+          lat: 20.2434,
+          lng: 85.8435,
+        },
+        show:true,
+        selected:false,
+		    id:'4cfb649ac671721e4959c318'
 		  }
+
+
 ];
 
 
@@ -60,12 +71,33 @@ for(var i=0;i<locations.length;i++)
     icon:defaultIcon,
 	  show:ko.observable(locations[i].show),
 	  selected:ko.observable(locations[i].selected),
-	  venue:locations[i].id
+	  venue:locations[i].id,
+    rating:'',
+    likes:''
   })
   markers.push(marker);
 
 
   //rating of the place
+
+  markers.forEach(function(marker){
+    $.ajax({
+      method:'GET',
+      dataType:'json',
+      url:'https://api.foursquare.com/v2/venues/'+marker.venue+'?client_id=ZNBWSBOKCVOK4KML4XW0XVSSPXXGLVP3UEPOQVHE1T5YSB1E&client_secret=F2CLYORZCNBNNDIUVZATCZQW5DRUWFQHMZFTP1JMN3K3143I&v=20170305',
+      success:function(data){
+        var request= data.response.venue;
+        if(request.hasOwnProperty('rating')!=''){
+          marker.rating=request.rating;
+        }
+        else {
+          marker.rating='';
+
+        }
+
+      }
+    })
+  });
   //color change on click
   marker.addListener('click', function() {
     populateInfoWindow(this, largeInfowindow);
@@ -89,51 +121,18 @@ function makeMarkerIcon(markerColor) {
   return markerImage;
 }
 function populateInfoWindow(marker, infowindow) {
-  // Check to make sure the infowindow is not already opened on this marker.
-  if (infowindow.marker != marker) {
-    // Clear the infowindow content to give the streetview time to load.
-    infowindow.setContent('');
-    infowindow.marker = marker;
-    // Make sure the marker property is cleared if the infowindow is closed.
-    infowindow.addListener('closeclick', function() {
-      infowindow.marker = null;
-    });
-    var streetViewService = new google.maps.StreetViewService();
-    var radius = 50;
-    // In case the status is OK, which means the pano was found, compute the
-    // position of the streetview image, then calculate the heading, then get a
-    // panorama from that and set the options
-    function getStreetView(data, status) {
-      if (status == google.maps.StreetViewStatus.OK) {
-        var nearStreetViewLocation = data.location.latLng;
-        var heading = google.maps.geometry.spherical.computeHeading(
-          nearStreetViewLocation, marker.position);
-          infowindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
-          var panoramaOptions = {
-            position: nearStreetViewLocation,
-            pov: {
-              heading: heading,
-              pitch: 30
-            }
-          };
-        var panorama = new google.maps.StreetViewPanorama(
-          document.getElementById('pano'), panoramaOptions);
-      } else {
-        infowindow.setContent('<div>' + marker.title + '</div>' +
-          '<div>No Street View Found</div>');
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+          infowindow.marker = marker;
+          infowindow.setContent('<div>' + marker.title + '<br>'+marker.rating+'<br>'+marker.likes+'</div>');
+          infowindow.open(map, marker);
+          // Make sure the marker property is cleared if the infowindow is closed.
+          infowindow.addListener('closeclick', function() {
+            infowindow.marker = null;
+          });
+        }
       }
-    }
-    // Use streetview service to get the closest streetview image within
-    // 50 meters of the markers position
-    streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
-    // Open the infowindow on the correct marker.
-    infowindow.open(map, marker);
-  }
-}
-/*this.selectAll=function(marker){
-  this.selected=true;
-  populateInfoWindow(marker,largeInfowindow);
-};*/
+
 this.selectAll=function(marker){
   marker.setAnimation(google.maps.Animation.BOUNCE);
   marker.setIcon(highlightedIcon);

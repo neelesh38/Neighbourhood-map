@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 nav nav-tabs" >
+      <div class="col-md-12" >
         <ul data-bind="foreach:markers" class="nav navbar-nav">
           <li class="list" data-bind="text:title,click:$parent.selectAll"></li>
         </ul>
@@ -38,7 +38,7 @@
   function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
               center: {  lat: 19.8134,lng: 85.8315},
-              zoom: 10
+              zoom: 8
           });
           ko.applyBindings(new viewModel());
   }
