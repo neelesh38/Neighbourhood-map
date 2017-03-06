@@ -56,7 +56,8 @@ var locations=[
 
 var markers=[];
 var viewModel=function(){
-  var largeInfowindow = new google.maps.InfoWindow();
+  var self=this;
+    var largeInfowindow = new google.maps.InfoWindow();
 for(var i=0;i<locations.length;i++)
 {
   var position=locations[i].location;
@@ -86,14 +87,15 @@ for(var i=0;i<locations.length;i++)
       dataType:'json',
       url:'https://api.foursquare.com/v2/venues/'+marker.venue+'?client_id=ZNBWSBOKCVOK4KML4XW0XVSSPXXGLVP3UEPOQVHE1T5YSB1E&client_secret=F2CLYORZCNBNNDIUVZATCZQW5DRUWFQHMZFTP1JMN3K3143I&v=20170305',
       success:function(data){
+        //console.log(marker.venue);
         var request= data.response.venue;
-        if(request.hasOwnProperty('rating')!=''){
+        if(request.hasOwnProperty('rating')!='' && request.hasOwnProperty('rating')!==undefined){
           marker.rating=request.rating;
         }
         else {
           marker.rating='';
         }
-        if(request.hasOwnProperty('likes')!=''){
+        if(request.hasOwnProperty('likes')!=''&& request.hasOwnProperty('likes')!==undefined){
           marker.likes=request.likes.summary;
         }
         else {
@@ -101,6 +103,9 @@ for(var i=0;i<locations.length;i++)
 
         }
 
+      },
+      error:function(e){
+        console.log("Id not found");
       }
     })
   });
@@ -148,34 +153,36 @@ this.Bounce=function(marker){
         }, 700);
   populateInfoWindow(marker,largeInfowindow);
 };
+this.query=ko.observable('');
+  //console.log(this.query);
+  this.filterList=function(){
+    var currentText=this.query();
+    largeInfowindow.close();
 
-this.searchtext=ko.observable('');
-this.search=function(){
-  largeInfowindow.close();
-  var text=this.searchtext;
-  if(text.length===0){
-    this.showAll=true;
-  }
-  else {
-    for(var i=0;i<markers.length;i++)
-    {
-      if(markers[i].title.toLowerCase().indexOf(text.toLowerCase())>-1){
-        markers[i].show(true);
-        markers[i].setVisible(true);
-      }
-      else {
-        markers[i].show(false);
-        markers[i].setVisible(false);
-      }
+    if (currentText.length === 0) {
+        self.setAllShow(true);
+    } else {
+        for (var i = 0; i < markers.length; i++) {
+            // to check whether the searchText is there in the mapArray
+            if (markers[i].title.toLowerCase().indexOf(currentText.toLowerCase()) > -1) {
+                markers[i].show(true);
+                markers[i].setVisible(true);
+            } else {
+                markers[i].show(false);
+                markers[i].setVisible(false);
+            }
+        }
     }
-  }
-  largeInfowindow.close();
+    largeInfowindow.close();
+};
+
+// to show all the markers
+self.setAllShow = function(marker) {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].show(marker);
+        markers[i].setVisible(marker);
+    }
+};
+
 
 };
-this.showAll=function(marker){
-  for(var i=0;i<markers.length;i++){
-    markers[i].show(marker);
-    marker[i].setVisible(marker);
-  }
-};
-}
