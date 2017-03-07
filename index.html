@@ -25,7 +25,7 @@
           </div>
         </form>
         <ul data-bind="foreach:markers" class="nav navbar-nav">
-          <li class="list" data-bind="text:title,click:$parent.Bounce"></li>
+          <li class="list" data-bind="visible:show, event:{click:$parent.Bounce},text:title"></li>
         </ul>
 
       </div>
