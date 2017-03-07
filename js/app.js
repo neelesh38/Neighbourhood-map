@@ -1,11 +1,13 @@
+//Model Starts here
 var locations = [{
-        title: 'Jagannath Temple',
+        title: 'Chung Wah Chinese Restaurant',
         location: {
-            lat: 19.8047181,
-            lng: 85.8179802,
+            lat: 19.8011,
+            lng: 85.8319,
         },
         show: true,
         selected: false,
+        id: '506ac48be4b0677a1fd4f871'
 
     },
     {
@@ -19,14 +21,14 @@ var locations = [{
         id: '4cbdd05b3481199c2ecc6d3f'
     },
     {
-        title: 'Chilika Lake',
+        title: 'Hotel Holiday Resort',
         location: {
-            lat: 19.8450,
-            lng: 85.4788,
+            lat: 19.8026,
+            lng: 85.8412,
         },
         show: true,
         selected: false,
-        id: ' '
+        id: '4bd79337304fce728db733ab'
     },
     {
         title: 'Puri Beach',
@@ -52,7 +54,6 @@ var locations = [{
 
 ];
 
-
 var markers = [];
 var viewModel = function() {
     var self = this;
@@ -71,40 +72,15 @@ var viewModel = function() {
             show: ko.observable(locations[i].show),
             selected: ko.observable(locations[i].selected),
             venue: locations[i].id,
-            rating: '',
-            likes: ''
+
         });
+        rating: '';
+        likes: '';
         markers.push(marker);
 
 
         //rating of the place
 
-        markers.forEach(function(marker) {
-            $.ajax({
-                method: 'GET',
-                dataType: 'json',
-                url: 'https://api.foursquare.com/v2/venues/' + marker.venue + '?client_id=ZNBWSBOKCVOK4KML4XW0XVSSPXXGLVP3UEPOQVHE1T5YSB1E&client_secret=F2CLYORZCNBNNDIUVZATCZQW5DRUWFQHMZFTP1JMN3K3143I&v=20170305',
-                success: function(data) {
-                    //console.log(marker.venue);
-                    var request = data.response.venue;
-                    if (request.hasOwnProperty('rating') !== '') {
-                        marker.rating = request.rating;
-                    } else {
-                        marker.rating = '';
-                    }
-                    if (request.hasOwnProperty('likes') !== '') {
-                        marker.likes = request.likes.summary;
-                    } else {
-                        marker.likes = '';
-
-                    }
-
-                },
-                error: function(e) {
-                    console.log("Id not found");
-                }
-            });
-        });
         //color change on click
         marker.addListener('click', function() {
             populateInfoWindow(this, largeInfowindow);
@@ -117,6 +93,34 @@ var viewModel = function() {
             this.setIcon(defaultIcon);
         });
     }
+    markers.forEach(function(marker) {
+        //console.log(marker);
+        $.ajax({
+            method: 'GET',
+            dataType: 'json',
+            url: 'https://api.foursquare.com/v2/venues/' + marker.venue + '?client_id=ZNBWSBOKCVOK4KML4XW0XVSSPXXGLVP3UEPOQVHE1T5YSB1E&client_secret=F2CLYORZCNBNNDIUVZATCZQW5DRUWFQHMZFTP1JMN3K3143I&v=20170305',
+            success: function(data) {
+                //console.log(marker.venue);
+                var request = data.response.venue;
+                if (request.hasOwnProperty('rating') !== '') {
+                    marker.rating = request.rating;
+                } else {
+                    marker.rating = '';
+                }
+                if (request.hasOwnProperty('likes') !== '') {
+                    marker.likes = request.likes.summary;
+                } else {
+                    marker.likes = '';
+
+                }
+
+            },
+            error: function(e) {
+                console.log("Error loading in id");
+            }
+        });
+    });
+
 
     function makeMarkerIcon(markerColor) {
         var markerImage = new google.maps.MarkerImage(
@@ -156,13 +160,14 @@ var viewModel = function() {
     this.filterList = function() {
         var text = this.query();
         largeInfowindow.close();
+        //here to close all the windows
 
         if (text.length === 0) {
             this.setAllShow(true);
         } else {
             for (var i = 0; i < markers.length; i++) {
                 // to check whether the searchText is there in the mapArray
-                if (markers[i].title.toLowerCase().indexOf(text.toLowerCase()) >=0) {
+                if (markers[i].title.toLowerCase().indexOf(text.toLowerCase()) >= 0) {
                     markers[i].show(true);
                     markers[i].setVisible(true);
                 } else {
