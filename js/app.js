@@ -79,8 +79,6 @@ var viewModel = function() {
         markers.push(marker);
 
 
-        //rating of the place
-
         //color change on click
         marker.addListener('click', function() {
             populateInfoWindow(this, largeInfowindow);
@@ -92,6 +90,10 @@ var viewModel = function() {
         marker.addListener('mouseout', function() {
             this.setIcon(defaultIcon);
         });
+
+      marker.addListener('click',function(){
+        bounce(this);
+      });
     }
     markers.forEach(function(marker) {
         //console.log(marker);
@@ -102,21 +104,24 @@ var viewModel = function() {
             success: function(data) {
                 //console.log(marker.venue);
                 var request = data.response.venue;
-                if (request.hasOwnProperty('rating') !== '') {
+                if (request.hasOwnProperty('rating') != '') {
                     marker.rating = request.rating;
                 } else {
-                    marker.rating = '';
+                    //marker.rating = '';
+                    marker.rating="Rating is not Found";
+                    //console.log("hello");
                 }
-                if (request.hasOwnProperty('likes') !== '') {
+                if (request.hasOwnProperty('likes') !='') {
                     marker.likes = request.likes.summary;
+
                 } else {
-                    marker.likes = '';
+                    marker.likes = 'Likes Not Found';
 
                 }
 
             },
             error: function(e) {
-                console.log("Error loading in id");
+                alert("Error loading in id");
             }
         });
     });
@@ -146,6 +151,16 @@ var viewModel = function() {
         }
     }
 
+     function bounce(marker)
+     {
+       marker.setAnimation(google.maps.Animation.BOUNCE);
+       marker.setIcon(highlightedIcon);
+       setTimeout(function() {
+           marker.setAnimation(null);
+           marker.setIcon(defaultIcon);
+       }, 700);
+       populateInfoWindow(marker, largeInfowindow);
+     }
     this.Bounce = function(marker) {
         marker.setAnimation(google.maps.Animation.BOUNCE);
         marker.setIcon(highlightedIcon);
